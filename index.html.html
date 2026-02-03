@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>M-M-B List Mobile Pro 🚀</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ff4500">
+  <style>
+    body { font-family: 'Arial', sans-serif; background: linear-gradient(to bottom, #f6d365, #fda085); text-align:center; padding:50px 20px; }
+    h1 { color: #ff4500; font-size:48px; text-shadow:2px 2px 5px rgba(0,0,0,0.2); }
+    #taskInput, #prioritySelect { padding:10px; border-radius:8px; border:none; font-size:16px; margin-bottom:10px; box-shadow:0 3px 6px rgba(0,0,0,0.1); }
+    button { padding:10px 20px; border:none; border-radius:8px; background-color:#1d3557; color:white; font-size:16px; cursor:pointer; margin-left:5px; transition:all 0.3s ease; box-shadow:0 3px 6px rgba(0,0,0,0.2); }
+    button:hover { background-color:#457b9d; transform:scale(1.05); }
+    ul { list-style:none; padding:0; max-width:450px; margin:30px auto; }
+    li { margin:10px 0; padding:15px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 5px 10px rgba(0,0,0,0.15); cursor:pointer; opacity:0; transform:translateY(-20px); animation:appear 0.3s forwards; transition:background-color 0.3s; }
+    li.low { background-color:#d1f7d6; }
+    li.medium { background-color:#fff3b0; }
+    li.high { background-color:#ffb3b3; }
+    li.completed { text-decoration:line-through; opacity:0.6; background-color:#d3f8e2 !important; }
+    .delete-btn { background-color:#ff4500; border:none; padding:6px 12px; border-radius:8px; color:white; cursor:pointer; transition:all 0.3s ease; }
+    .delete-btn:hover { background-color:#e63900; transform:scale(1.1); }
+    @keyframes appear { to { opacity:1; transform:translateY(0); } }
+    #counter { margin-top:20px; font-size:18px; color:#333; font-weight:bold; }
+  </style>
+</head>
+<body>
+
+  <h1>M-M-B List Mobile Pro 🚀</h1>
+
+  <input type="text" id="taskInput" placeholder="Ajouter une tâche...">
+  <select id="prioritySelect">
+    <option value="low">Priorité faible</option>
+    <option value="medium">Priorité moyenne</option>
+    <option value="high">Priorité haute</option>
+  </select>
+  <button onclick="addTask()">Ajouter</button>
+
+  <ul id="taskList"></ul>
+  <div id="counter"></div>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const taskList = document.getElementById('taskList');
+    const counter = document.getElementById('counter');
+
+    function renderTasks() {
+      tasks.sort((a,b)=>a.completed-b.completed);
+      taskList.innerHTML="";
+      tasks.forEach((task,index)=>{
+        const li=document.createElement('li');
+        li.textContent=task.text;
+        li.className=task.priority;
+        if(task.completed) li.classList.add('completed');
+        li.onclick=()=>toggleComplete(index);
+
+        const deleteBtn=document.createElement('button');
+        deleteBtn.textContent='Supprimer';
+        deleteBtn.className='delete-btn';
+        deleteBtn.onclick=(e)=>{e.stopPropagation(); deleteTask(index);}
+        li.appendChild(deleteBtn);
+
+        taskList.appendChild(li);
+      });
+      updateCounter();
+    }
+
+    function addTask(){
+      const input=document.getElementById('taskInput');
+      const prioritySelect=document.getElementById('prioritySelect');
+      const taskText=input.value.trim();
+      const priority=prioritySelect.value;
+      if(!taskText) return;
+      tasks.push({text:taskText,completed:false,priority:priority});
+      saveTasks();
+      renderTasks();
+      input.value="";
+    }
+
+    function deleteTask(index){ tasks.splice(index,1); saveTasks(); renderTasks();}
+    function toggleComplete(index){ tasks[index].completed=!tasks[index].completed; saveTasks(); renderTasks();}
+    function saveTasks(){ localStorage.setItem('tasks',JSON.stringify(tasks));}
+    function updateCounter(){ counter.textContent=`Tâches restantes : ${tasks.filter(t=>!t.completed).length}`;}
+
+    renderTasks();
+
+    // Enregistrer le Service Worker
+    if('serviceWorker' in navigator){
+      window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(reg=>console.log('Service Worker enregistré !',reg)).catch(err=>console.log('Erreur SW:',err));});
+    }
+  </script>
+
+</body>
+</html>

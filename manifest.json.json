@@ -1,0 +1,20 @@
+{
+  "name": "M-M-B List Mobile Pro",
+  "short_name": "MMBPro",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f6d365",
+  "theme_color": "#ff4500",
+  "icons": [
+    {
+      "src": "icon-192.jpg.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.jpg.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
